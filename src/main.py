@@ -2,29 +2,22 @@ import flet as ft
 
 
 def main(page: ft.Page):
-    # установка заголовка
-    page.title = "Привет мир"
+    page.title = "список друзей"
 
-    friends = ['Elmira', 'Nasiba', 'Nika', 'Nursultan', 'Nurlis', 'Emir']
+    friends = []
 
-    def name(check):
-        if name_input.value in friends:
-            print('Drug naiden', name_input.value)
-        else:
-            print('Drug ne naiden', name_input.value)
+    def friend(add):
+        friends.append(name_input.value)
+        print("Список друзей:", friends)
 
-    # функция, которая будет вызываться при изменении значения текстового поля
-    #def change_name(e):
-    #    print(name_input.value)
-
-    # создание текстового поля
     name_input = ft.TextField(
-        label="введите имя",  # текст подсказки
-        on_change=name,  # функция, которая будет вызываться при изменении значения
-    )
+        label="введите имя")
+    
+    button = ft.ElevatedButton(
+        text="Добавить", 
+        on_click=friend)
 
-    # добавление текстового поля на страницу(окно)
-    page.add(name_input)
+    page.add(name_input, button)
 
 
 ft.app(main)
