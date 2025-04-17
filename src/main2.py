@@ -1,7 +1,7 @@
 import flet as ft
 
 def main(page: ft.Page):
-    page.title = "список друзей"
+    page.title = ""
 
     friends = []
 
@@ -21,3 +21,5 @@ def main(page: ft.Page):
     page.add(name_input, age_input, button)
 
 ft.app(main)
+
+
