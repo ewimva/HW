@@ -1,4 +1,6 @@
 import flet as ft
+from database import Database
+from pprint import pprint
 
 def main(page: ft.Page):
     page.title = "Ваши расходы"

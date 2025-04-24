@@ -1,6 +1,5 @@
 import sqlite3
 
-
 class Database:
     def __init__(self, path: str):
         self.path = path
@@ -8,31 +7,31 @@ class Database:
     def create_tables(self):
         with sqlite3.connect(self.path) as conn:
             cursor = conn.cursor()
-            cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS todos (
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS expenses (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    todo TEXT,
-                    category TEXT
+                    title TEXT NOT NULL,
+                    amount REAL NOT NULL
                 )
-                """
-            )
+            ''')
             conn.commit()
 
-    def add_todo(self, todo: str, category: str):
+    def add_expenses(self, title, amount):
         with sqlite3.connect(self.path) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                """
-                INSERT INTO todos (todo, category) VALUES (?, ?)
-                """,
-                (todo, category),
-            )
+            """INSERT INTO expenses (title, amount) VALUES (?, ?)""", (title, amount))
             conn.commit()
 
-
-    def all_todos(self):
+    def all_(self):
         with sqlite3.connect(self.path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM todos")
+            cursor.execute("SELECT * FROM expenses")
             return cursor.fetchall()
+
+    def get_total(self):
+        with sqlite3.connect(self.path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT SUM(amount) FROM expenses")
+            result = cursor.fetchone()[0]
+            return int(result) if result else 0
