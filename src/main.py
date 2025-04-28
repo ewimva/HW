@@ -21,10 +21,10 @@ def main(page: ft.Page):
         for t in database.all_():
             rows.append(
                 ft.Row([
-                    ft.Text(t[1], size=20, color=ft.colors.PINK),
+                    ft.Text(t[1], size=20, color=ft.Colors.PINK),
                     ft.Text(str(int(t[2])), size=20),
-                    ft.IconButton(icon=ft.icons.EDIT_OUTLINED, icon_color=ft.colors.BLUE, icon_size=20,),
-                    ft.IconButton(icon=ft.icons.DELETE_OUTLINED, icon_color=ft.colors.RED, icon_size=20, on_click=before_delete, data=t[0],),
+                    ft.IconButton(icon=ft.Icons.EDIT_OUTLINED, icon_color=ft.Colors.BLUE, icon_size=20,),
+                    ft.IconButton(icon=ft.Icons.DELETE_OUTLINED, icon_color=ft.Colors.RED, icon_size=20, on_click=before_delete, data=t[0],),
                 ])
             )
         return rows
@@ -42,8 +42,8 @@ def main(page: ft.Page):
 
     def before_delete(e):
         page.data = e.control.data
-        page.dialog = delete_modal
-        delete_modal.open = True
+        print(e.control.data)
+        page.open(delete_modal)
         page.update()
 
     def handle_close_delete(e):
@@ -51,6 +51,7 @@ def main(page: ft.Page):
         page.update()
 
     def delete_expense(e):
+        print(page.data)
         database.delete_expense(page.data)
         delete_modal.open = False
         total = database.get_total()
@@ -58,7 +59,7 @@ def main(page: ft.Page):
         expense_list_area.controls = build_rows()
         page.update()
 
-    add_button = ft.ElevatedButton("Добавить", on_click=add_expense, color=ft.colors.PINK, bgcolor=ft.colors.AMBER)
+    add_button = ft.ElevatedButton("Добавить", on_click=add_expense, color=ft.Colors.PINK, bgcolor=ft.Colors.AMBER)
     form_area = ft.Row([name_input, amount_input, add_button])
     expense_list_area = ft.Column(expand=True, scroll="always", controls=build_rows())
 
@@ -70,14 +71,14 @@ def main(page: ft.Page):
             ft.ElevatedButton(
                 "Удалить",
                 on_click=delete_expense,
-                bgcolor=ft.colors.RED,
-                color=ft.colors.WHITE,
+                bgcolor=ft.Colors.RED,
+                color=ft.Colors.WHITE,
             ),
             ft.ElevatedButton(
                 "Отменить",
                 on_click=handle_close_delete,
-                bgcolor=ft.colors.GREEN,
-                color=ft.colors.WHITE,
+                bgcolor=ft.Colors.GREEN,
+                color=ft.Colors.WHITE,
             ),
         ],
     )
