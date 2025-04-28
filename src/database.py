@@ -35,3 +35,9 @@ class Database:
             cursor.execute("SELECT SUM(amount) FROM expenses")
             result = cursor.fetchone()[0]
             return int(result) if result else 0
+        
+    def delete_expense(self, expense_id: int):
+        with sqlite3.connect(self.path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
+            conn.commit()
