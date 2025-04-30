@@ -5,16 +5,16 @@ from pprint import pprint
 
 def main(page: ft.Page):
     page.title = "Ваши расходы"
-    itle = ft.Text("Ваши расходы", size=40, weight=ft.FontWeight.BOLD)
+    title = ft.Text("Ваши расходы", size=40, weight=ft.FontWeight.BOLD)
     database = Database("database.sqlite")
     database.create_tables()
     pprint(database.all_())
-    page.data = None
-    # page.data = database.get_total()
 
     name_input = ft.TextField(label="Название расхода")
     amount_input = ft.TextField(label="Сумма расхода")
-    total_text = ft.Text(f"Общая сумма расходов: {page.data}")
+    total_text = ft.Text(f"Общая сумма расходов: {database.get_total()}")
+    edit_name_input = ft.TextField(label="Название расхода")
+    edit_amount_input = ft.TextField(label="Сумма расхода")
 
     def build_rows():
         rows = []
@@ -23,8 +23,20 @@ def main(page: ft.Page):
                 ft.Row([
                     ft.Text(t[1], size=20, color=ft.Colors.PINK),
                     ft.Text(str(int(t[2])), size=20),
-                    ft.IconButton(icon=ft.Icons.EDIT_OUTLINED, icon_color=ft.Colors.BLUE, icon_size=20,),
-                    ft.IconButton(icon=ft.Icons.DELETE_OUTLINED, icon_color=ft.Colors.RED, icon_size=20, on_click=before_delete, data=t[0],),
+                    ft.IconButton(
+                        icon=ft.Icons.EDIT_OUTLINED,
+                        icon_color=ft.Colors.BLUE,
+                        icon_size=20,
+                        on_click=before_edit,
+                        data=t,
+                    ),
+                    ft.IconButton(
+                        icon=ft.Icons.DELETE_OUTLINED,
+                        icon_color=ft.Colors.RED,
+                        icon_size=20,
+                        on_click=before_delete,
+                        data=t[0],
+                    ),
                 ])
             )
         return rows
@@ -32,9 +44,9 @@ def main(page: ft.Page):
     def add_expense(e):
         if name_input.value and amount_input.value.isdigit():
             amount = int(amount_input.value)
-            page.data += amount
-            total_text.value = f"Общая сумма расходов: {page.data}"
             database.add_expenses(name_input.value, amount)
+            total = database.get_total()
+            total_text.value = f"Общая сумма расходов: {total}"
             name_input.value = ""
             amount_input.value = ""
             expense_list_area.controls = build_rows()
@@ -51,7 +63,6 @@ def main(page: ft.Page):
         page.update()
 
     def delete_expense(e):
-        print(page.data)
         database.delete_expense(page.data)
         delete_modal.open = False
         total = database.get_total()
@@ -59,9 +70,42 @@ def main(page: ft.Page):
         expense_list_area.controls = build_rows()
         page.update()
 
+
+
+    def before_edit(e):
+        expense = e.control.data
+        page.data = expense[0]
+        edit_name_input.value = expense[1]
+        edit_amount_input.value = str(int(expense[2]))
+        page.open(edit_modal)
+        page.update()
+
+    def handle_close_edit(e):
+        edit_modal.open = False
+        page.update()
+
+    def save_edit_expense(e):
+        if edit_name_input.value and edit_amount_input.value.isdigit():
+            new_name = edit_name_input.value
+            new_amount = int(edit_amount_input.value)
+            database.update_expense(page.data, new_name, new_amount)
+            edit_modal.open = False
+            total = database.get_total()
+            total_text.value = f"Общая сумма расходов: {total}"
+            expense_list_area.controls = build_rows()
+            page.update()
+
+
+
+
+
+
     add_button = ft.ElevatedButton("Добавить", on_click=add_expense, color=ft.Colors.PINK, bgcolor=ft.Colors.AMBER)
     form_area = ft.Row([name_input, amount_input, add_button])
     expense_list_area = ft.Column(expand=True, scroll="always", controls=build_rows())
+
+
+
 
     delete_modal = ft.AlertDialog(
         modal=True,
@@ -83,6 +127,45 @@ def main(page: ft.Page):
         ],
     )
 
+
+
+
+
+
+    edit_modal = ft.AlertDialog(
+        modal=True,
+        title=ft.Text("Редактировать расход"),
+        content=ft.Column([
+            edit_name_input,
+            edit_amount_input,
+        ]),
+        actions=[
+            ft.ElevatedButton(
+                "Сохранить",
+                on_click=save_edit_expense,
+                bgcolor=ft.Colors.BLUE,
+                color=ft.Colors.WHITE,
+            ),
+            ft.ElevatedButton(
+                "Отменить",
+                on_click=handle_close_edit,
+                bgcolor=ft.Colors.GREY,
+                color=ft.Colors.WHITE,
+            ),
+        ],
+    )
+
+
+
     page.add(form_area, total_text, expense_list_area)
+
+
+
+
+
+
+
+
+
 
 ft.app(main)
