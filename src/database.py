@@ -41,3 +41,11 @@ class Database:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
             conn.commit()
+
+    def update_expense(self, expense_id: int, new_name: str, new_amount: float):
+        with sqlite3.connect(self.path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE expenses SET title = ?, amount = ? WHERE id = ?", (new_name, new_amount, expense_id))
+            conn.commit()
+
